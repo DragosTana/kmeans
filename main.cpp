@@ -1,6 +1,5 @@
 
-#include "Point.h"
-#include<iostream>
+#include "kmeans.cpp"
 
 int main(){
     std::cout<<"Hello world!";

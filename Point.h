@@ -7,6 +7,7 @@
 
 #include<float.h>
 
+
 struct Point{
 
     double x, y;
