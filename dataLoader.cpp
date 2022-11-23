@@ -4,14 +4,10 @@
 
 
 #include "Point.h"
-#include<fstream>
-#include<string.h>
-#include<sstream>
-#include<vector>
-#include<iostream>
 
 
-std::vector<Point> load_csv (std::string file_name){
+
+std::vector<Point> load_csv (const std::string& file_name){
 
     std::vector<Point> points;
     std::ifstream file;
@@ -22,19 +18,31 @@ std::vector<Point> load_csv (std::string file_name){
         std::cout<<"file is opened"<<std::endl;
         while(getline(file, line)){
             std::stringstream str(line);
-            Point point;
+            Point p;
             int i = 0;
             while(getline(str, word, ',')){
-                if(i == 0){
-                    point.x = std::stod(word);
+                    p.coordinates[i] = std::stod(word);
                     i++;
-                }
-                else point.y = std::stod(word);
             }
-            points.push_back(point);
+            p.cluster = -1;
+            points.push_back(p);
         }
     }
     else std::cout<<"ERROR: couldn't open file"<<std::endl;
 
     return points;
+}
+
+void output_results (std::vector<Point>& points){
+    std::fstream output;
+    output.open("output.txt", std::ios::out);
+    if(output.is_open()){
+        for(Point p: points){
+            for (int i = 0; i < DIM; i++){
+                output<<p.coordinates[i]<<",";
+            }
+            output<<p.cluster;
+            output<<std::endl;
+        }
+    }
 }
