@@ -2,10 +2,8 @@
 // Created by dragos on 31/10/22.
 //
 
-
 #include "Point.h"
-
-
+#include <time.h>
 
 std::vector<Point> load_csv (const std::string& file_name){
 
@@ -45,4 +43,17 @@ void output_results (std::vector<Point>& points){
             output<<std::endl;
         }
     }
+}
+
+uint64_t nanos(){
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_sec * 1000000000 + ts.tv_nsec;
+}
+
+double euclidean_dist(const Point& p1, const Point& p2){
+    double distance= 0;
+    for (int i=0; i<DIM; i++)
+        distance += (p1.coordinates[i] - p2.coordinates[i]) * (p1.coordinates[i] - p2.coordinates[i]);
+    return distance;
 }

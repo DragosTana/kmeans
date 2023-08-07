@@ -57,10 +57,10 @@ struct Point{
     }
 
     double compute_distance(const Point& p) const {
-        double distance= 0;
+        double total_d = 0;
         for (int i=0; i<DIM; i++)
-            distance += (this->coordinates[i] - p.coordinates[i]) * (this->coordinates[i] - p.coordinates[i]);
-        return distance;
+            total_d += (this->coordinates[i] - p.coordinates[i]) * (this->coordinates[i] - p.coordinates[i]);
+        return total_d;
     }
 
 };
