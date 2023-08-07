@@ -6,6 +6,12 @@
 #include "Point.h"
 #include <random>
 
+/*
+* This function checks if a point is already in a vector of points
+* @param points: the vector of points
+* @param p: the point to be checked
+* @return true if the point is in the vector, false otherwise
+*/
 bool contatins(std::vector<Point>& points, Point&  p){
     for(Point el: points){
         if(el == p){
@@ -15,6 +21,12 @@ bool contatins(std::vector<Point>& points, Point&  p){
     return false;
 }
 
+/*
+* This function randomly initializes the centroids
+* @param points: the vector of points
+* @param k: the number of clusters
+* @return a vector of centroids
+*/
 std::vector<Point> random_initializer (const std::vector<Point>& points, const int& k){
     double tstart, tstop;
     tstart = omp_get_wtime();
@@ -40,12 +52,18 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
     return centroids;
 }
 
+/*
+* This function initializes centroids by choosing the farthest points from each other
+* @param points: the vector of points
+* @param k: the number of clusters
+* @return a vector of centroids
+*/
 std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k) {
     double tstart, tstop;
     tstart = omp_get_wtime();
 
-    std::random_device rd;       // Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd());   // Standard mersenne_twister_engine seeded with rd()
+    std::random_device rd;       
+    std::mt19937 gen(rd());   
     std::uniform_int_distribution<> distrib(0, data.size());
 
     std::vector<Point> centroids;
