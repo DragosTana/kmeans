@@ -29,14 +29,14 @@ def main():
         num_samples = int(input("Enter number of samples: "))
         dimensions = int(input("Enter number of dimensions: "))
         num_clusters = int(input("Enter number of clusters: "))
-        X, _ = make_blobs(n_samples=num_samples, n_features=dimensions, centers=num_clusters, center_box=(-10.0, 10.0), cluster_std=1, shuffle=True)
-        file_name = ("data{num_samples}_{dimensions}_{num_clusters}.csv".format(num_samples=num_samples, dimensions=dimensions, num_clusters=num_clusters))  
-        print("Saving to file: ", file_name)
+        X, _ = make_blobs(n_samples=num_samples, n_features=dimensions, centers=num_clusters, center_box=(-10.0, 10.0), cluster_std=2, shuffle=True)
+        file_name = ("{num_samples}_{dimensions}_{num_clusters}.csv".format(num_samples=num_samples, dimensions=dimensions, num_clusters=num_clusters))  
+        print("Saving to file: ", file_name, " ...")
         np.savetxt(file_name, X, delimiter=",")    
     
     if mode == 2:
         #filename = input("Enter filename: ")
-        X = np.loadtxt("output.txt", delimiter=",")
+        X = np.loadtxt("output.csv", delimiter=",")
         plot_data(X)
         
 main()
