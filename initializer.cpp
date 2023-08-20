@@ -51,13 +51,13 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k, int& threads) {
+std::vector<Point> kmeanpp_initializer (const std::vector<Point>& points, int& k, int& threads) {
     std::random_device rd;       
     std::mt19937 gen(rd());   
-    std::uniform_int_distribution<> distrib(0, data.size());
+    std::uniform_int_distribution<> distrib(0, points.size());
 
     std::vector<Point> centroids;
-    Point starting_point = data[distrib(gen)];
+    Point starting_point = points[distrib(gen)];
     starting_point.cluster = 0;
     centroids.push_back(starting_point);
 
@@ -69,8 +69,8 @@ std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k, 
         for (double& el:partial_max_dist)
             el = 0.;
         Point partial_next_point[omp_get_max_threads()];
-        #pragma omp parallel for num_threads(threads) default(none) shared(partial_max_dist, partial_next_point) firstprivate(centroids, data) schedule(static, 64)
-        for (const Point& el:data) {
+        #pragma omp parallel for num_threads(threads) default(none) shared(partial_max_dist, partial_next_point) firstprivate(centroids, points) schedule(static, 64)
+        for (const Point& el:points) {
             double min_dist = DBL_MAX;
             for (const Point& c:centroids) {
                 double d = el.compute_distance(c);
