@@ -64,17 +64,17 @@ std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& ce
     double difference = DBL_MAX;
     size_t iteration = 0;
 
-    //while (difference > eps) {
-    //
-    //    if (iteration++ > epochs){
-    //        std::cout << "Warning: maximum number of epochs reached" << std::endl;
-    //        break;
-    //    }
-    //    else{
-    //        difference = 0;
-    //    }
+    while (difference > eps) {
+    
+        if (iteration++ > epochs){
+            std::cout << "Warning: maximum number of epochs reached" << std::endl;
+            break;
+        }
+        else{
+            difference = 0;
+        }
 
-    for (int i = 0; i < epochs; i++) {
+    //for (int i = 0; i < epochs; i++) {
         for (int j = 0; j < k; j++) {
             tmp_new_centroids[j].to_zero(-1);
             tmp_cluster_cardinality[j] = 0;

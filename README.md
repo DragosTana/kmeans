@@ -29,13 +29,19 @@ To run use <code> ./kmean <dataset_file_name> <number_of_clusters> <thread_numbe
 - <code><dataset_file_name></code> path of the dataset as a csv file
 - <code><number_of_clusters></code> number of clusters
 - <code><thread_number></code> number of thread to be used
-- <code> <algorithm_type></code>  can be: _seq_ or _par_ for sequential and parallel version respectively
+- <code> <algorithm_type></code>  can be: _rand_ or _pp_ for random or kmeans pp initializer respectivly
 
 For example:
+`./kmean 100000_3_6.csv 6 16 rand`
 
 ### Generate datasets
 
-The dataset_gen.py module allows the user to create custom datasets and visualize the result of the kmeans algorithm. To use run <code> python3 dataset_gen.py</code> and follow the instructions.
+The dataset_gen.py module allows the user to create custom datasets and visualize the result of the kmeans algorithm. To use run `python3 dataset_gen.py`and follow the instructions.
 
+# Results
+The result of the kmean algorithm is shown below
 
+Raw Data                   |  After kmeans
+:-------------------------:|:-------------------------:
+![](images/Screenshot%20from%202023-08-10%2014-14-58.png)   |  ![](images/Screenshot%20from%202023-08-10%2014-16-05.png)
 
