@@ -4,6 +4,7 @@
 
 #include "Point.h"
 #include <time.h>
+#include<immintrin.h>
 
 /*
 * This function loads the data from a csv file
@@ -54,7 +55,6 @@ void output_results (std::vector<Point>& points){
         }
     }
 }
-
 
 uint64_t nanos(){
     struct timespec ts;

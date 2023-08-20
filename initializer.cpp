@@ -12,9 +12,9 @@
 * @param p: the point to be checked
 * @return true if the point is in the vector, false otherwise
 */
-bool contatins(std::vector<Point>& points, Point&  p){
-    for(Point el: points){
-        if(el == p){
+bool contatins(std::vector<Point>& points, Point&  p) {
+    for (Point el: points) {
+        if (el == p) {
             return true;
         }
     }
@@ -27,28 +27,21 @@ bool contatins(std::vector<Point>& points, Point&  p){
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> random_initializer (const std::vector<Point>& points, const int& k){
-    double tstart, tstop;
-    tstart = omp_get_wtime();
-
+std::vector<Point> random_initializer (const std::vector<Point>& points, const int& k) {
     std::vector<Point> centroids;
     std::random_device rand_dev;       
     std::mt19937 gen(rand_dev());   
     std::uniform_int_distribution<> distrib(0, points.size());
     int i = 0;
 
-    while(centroids.size()<k){
+    while (centroids.size()<k) {
         Point new_centroid = points[distrib(gen)];
-        if(!contatins(centroids, new_centroid)){
+        if (!contatins(centroids, new_centroid)) {
             new_centroid.cluster=i;
             i++;
             centroids.push_back(new_centroid);
-
         }
     }
-    tstop = omp_get_wtime();
-    printf("Random Initialization execution time: %f\n", tstop - tstart);
-
     return centroids;
 }
 
@@ -58,10 +51,7 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k) {
-    double tstart, tstop;
-    tstart = omp_get_wtime();
-
+std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k, int& threads) {
     std::random_device rd;       
     std::mt19937 gen(rd());   
     std::uniform_int_distribution<> distrib(0, data.size());
@@ -79,7 +69,7 @@ std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k) 
         for (double& el:partial_max_dist)
             el = 0.;
         Point partial_next_point[omp_get_max_threads()];
-#pragma omp parallel for num_threads(omp_get_max_threads()) default(none) shared(partial_max_dist, partial_next_point) firstprivate(centroids, data) schedule(static, 64)
+        #pragma omp parallel for num_threads(threads) default(none) shared(partial_max_dist, partial_next_point) firstprivate(centroids, data) schedule(static, 64)
         for (const Point& el:data) {
             double min_dist = DBL_MAX;
             for (const Point& c:centroids) {
@@ -92,7 +82,6 @@ std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k) 
                 partial_next_point[omp_get_thread_num()] = el;
             }
         }
-
         for (int j=0; j<omp_get_max_threads(); j++){
             if (partial_max_dist[j] > max_dist){
                 max_dist = partial_max_dist[j];
@@ -102,9 +91,6 @@ std::vector<Point> kmeanpp_initializer (const std::vector<Point>& data, int& k) 
         next_point.cluster = i;
         centroids.push_back(next_point);
     }
-    tstop = omp_get_wtime();
-    printf("KMean++ Initialization execution time: %f\n", tstop - tstart);
-
     return centroids;
 }
 
