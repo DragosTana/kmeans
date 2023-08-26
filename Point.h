@@ -17,7 +17,7 @@
 
 struct Point{
 
-    double coordinates[DIM] __attribute__((aligned(64)));
+    double coordinates[DIM];
     int cluster;
 
     Point(){

@@ -11,7 +11,7 @@ int main(int argc, const char *argv[]) {
     int clusters = atoi(argv[2]);
     int threads = atoi(argv[3]);
     std::string algorithm = argv[4];
-    int epochs = 1000;
+    int epochs = 100;
     double dtime;
     std::vector<Point> points = load_csv(file_name);
     
@@ -21,14 +21,14 @@ int main(int argc, const char *argv[]) {
         std::vector<Point> centroids = random_initializer(points, clusters);
         centroids = kmean_par (points, centroids, epochs, clusters, threads);
         dtime = omp_get_wtime() - dtime;
-        std::cout<<"Time elapsed: "<<dtime<<std::endl;
+        std::cout<< dtime<<std::endl;
     }
     else if (algorithm == "pp"){
         dtime = omp_get_wtime();
         std::vector<Point> centroids = kmeanpp_initializer(points, clusters, threads);
         centroids = kmean_par (points, centroids, epochs, clusters, threads);
         dtime = omp_get_wtime() - dtime;
-        std::cout<<"Time elapsed: "<<dtime<<std::endl;
+        std::cout<< dtime<<std::endl;
     }
     else{
         std::cout<<"Invalid algorithm"<<std::endl;

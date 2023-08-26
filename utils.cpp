@@ -19,7 +19,7 @@ std::vector<Point> load_csv (const std::string& file_name){
     std::string line, word;
 
     if(file.is_open()){
-        std::cout<<"file is opened"<<std::endl;
+        //std::cout<<"file is opened"<<std::endl;
         while(getline(file, line)){
             std::stringstream str(line);
             Point p;
@@ -56,6 +56,10 @@ void output_results (std::vector<Point>& points){
     }
 }
 
+/*
+* This function returns the current time in nanoseconds
+* @return the current time in nanoseconds
+*/
 uint64_t nanos(){
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -70,6 +74,7 @@ uint64_t nanos(){
 */
 double euclidean_dist(const Point& p1, const Point& p2){
     double distance= 0;
+    #pragma omp simd reduction(+:distance)
     for (int i=0; i<DIM; i++)
         distance += (p1.coordinates[i] - p2.coordinates[i]) * (p1.coordinates[i] - p2.coordinates[i]);
     return distance;

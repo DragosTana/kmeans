@@ -57,53 +57,53 @@ std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& ce
 */
 std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& centroids, int& epochs, int& k, int& threads, float eps = FLT_MIN) {
     
-    std::vector<Point> new_centroids = std::vector<Point>(k);
+    std::vector<Point> new_centroids = std::vector<Point>(k, Point());
     std::vector<int> cluster_cardinality(k, 0);
-    std::vector<Point> tmp_new_centroids = std::vector<Point>(k);
-    std::vector<int> tmp_cluster_cardinality(k, 0);
     double difference = DBL_MAX;
     size_t iteration = 0;
 
-    while (difference > eps) {
-    
-        if (iteration++ > epochs){
-            std::cout << "Warning: maximum number of epochs reached" << std::endl;
-            break;
-        }
-        else{
-            difference = 0;
+    //while (difference > eps) {
+    //
+    //    if (iteration++ > epochs){
+    //        std::cout << "Warning: maximum number of epochs reached" << std::endl;
+    //        break;
+    //    }
+    //    else{
+    //        difference = 0;
+    //    }
+
+    int points_per_thread = ceil(points.size() / threads);
+
+    for (int i = 0; i < epochs; i++) {
+
+    #pragma omp parallel num_threads(threads) 
+    {   
+        std::vector<int> tmp_cluster_cardinality(k, 0);
+        std::vector<Point> tmp_new_centroids(k, Point());
+
+        #pragma omp for nowait schedule(static, points_per_thread)
+
+        for (Point& p: points) {
+            double distance = euclidean_dist(p, centroids[0]);
+            p.cluster = 0;
+            for (int i = 1; i < k; i++) {
+                double tmp = euclidean_dist(p, centroids[i]);
+                if (tmp  < distance) {
+                    distance = tmp;
+                    p.cluster = i;
+                }
+            }
+            tmp_new_centroids[p.cluster] += p;      
+            tmp_cluster_cardinality[p.cluster]++;
         }
 
-    //for (int i = 0; i < epochs; i++) {
-        for (int j = 0; j < k; j++) {
-            tmp_new_centroids[j].to_zero(-1);
-            tmp_cluster_cardinality[j] = 0;
-            new_centroids[j].to_zero(-1);
-            cluster_cardinality[j] = 0;
-        }
-
-        #pragma omp parallel firstprivate(tmp_new_centroids, tmp_cluster_cardinality) num_threads(threads) 
+        #pragma omp critical
         {
-            #pragma omp for schedule(static, 64)
-            for (Point& p: points) {
-                double distance = DBL_MAX;
-                for (int i = 0; i < k; i++) {
-                    if (euclidean_dist(p, centroids[i]) < distance) {
-                        distance = euclidean_dist(p, centroids[i]);
-                        p.cluster = i;
-                    }
-                }
-                tmp_new_centroids[p.cluster] += p;      
-                tmp_cluster_cardinality[p.cluster]++;
+            for (int i = 0; i < k; i++) {
+                new_centroids[i] += tmp_new_centroids[i];
+                cluster_cardinality[i] += tmp_cluster_cardinality[i];
             }
-
-            #pragma omp critical
-            {
-                for (int i = 0; i < k; i++) {
-                    new_centroids[i] += tmp_new_centroids[i];
-                    cluster_cardinality[i] += tmp_cluster_cardinality[i];
-                }
-            }
+        }
         }
     
         for (int i = 0; i < k; i++) {
@@ -112,6 +112,9 @@ std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& ce
         }
         difference /= k;
         centroids = new_centroids;
+
+        new_centroids = std::vector<Point>(k, Point());
+        cluster_cardinality = std::vector<int>(k, 0);
     }
 
     return centroids;
