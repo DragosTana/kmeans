@@ -30,7 +30,7 @@ bool contatins(std::vector<Point>& points, Point&  p) {
 std::vector<Point> random_initializer (const std::vector<Point>& points, const int& k) {
     std::vector<Point> centroids;
     std::random_device rand_dev;       
-    std::mt19937 gen(111);   
+    std::mt19937 gen(rand_dev());   
     std::uniform_int_distribution<> distrib(0, points.size());
     int i = 0;
 
@@ -52,8 +52,8 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
 * @return a vector of centroids
 */
 std::vector<Point> kmeanpp_initializer (const std::vector<Point>& points, int& k, int& threads) {
-    std::random_device rd;       
-    std::mt19937 gen(rd());   
+    std::random_device random_device;;       
+    std::mt19937 gen(random_device());   
     std::uniform_int_distribution<> distrib(0, points.size());
 
     std::vector<Point> centroids;

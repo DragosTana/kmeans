@@ -79,10 +79,9 @@ std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& ce
     #pragma omp parallel num_threads(threads) 
     {   
         std::vector<int> tmp_cluster_cardinality(k, 0);
-        std::vector<Point> tmp_new_centroids(k, Point());
-
+        std::vector<Point> tmp_new_centroids(k, Point());   
+        
         #pragma omp for nowait schedule(static, points_per_thread)
-
         for (Point& p: points) {
             double distance = euclidean_dist(p, centroids[0]);
             p.cluster = 0;
@@ -104,7 +103,7 @@ std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& ce
                 cluster_cardinality[i] += tmp_cluster_cardinality[i];
             }
         }
-        }
+    }
     
         for (int i = 0; i < k; i++) {
             new_centroids[i] /= cluster_cardinality[i];

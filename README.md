@@ -13,7 +13,7 @@ This implementation requires the following dependencies:
 ## Compilation
 1. Clone this repository to your local machine.
 2. Navigate to the repository's directory.
-3. Run `g++ main.cpp -o kmean -fopenmp`
+3. Run `g++ main.cpp -o kmean -fopenmp -march=native`
 
 
 ## Usage
