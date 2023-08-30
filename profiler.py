@@ -5,26 +5,28 @@ import matplotlib.pyplot as plt
 
 def speedUp():
     threads_num = [1, 2, 4, 8, 16]
-    point_num = [1000, 5000, 10000, 50000, 100000]
+    point_num = "10000"
     output = []
-    result = np.zeros((len(point_num), len(threads_num)))
-    speedup = np.zeros((len(point_num), len(threads_num)))
+    cluster_num = [2, 3, 5, 10, 20, 50]
+    result = np.zeros((len(cluster_num), len(threads_num)))
+    speedup = np.zeros((len(cluster_num), len(threads_num)))
 
     executable_path = "./kmean"
 
-    for p in point_num:
+    for c in cluster_num:
         for t in threads_num:
-            print("Point number: {}, Thread number: {}".format(p, t))
+            print("Cluster number: {}, Thread number: {}".format(c, t))
 
             for i in range(100):
-                args = [executable_path, "{}_3_10.csv".format(p), "10", str(t), "rand"]
+                args = [executable_path, "10000_3_{}.csv".format(c), str(c), str(t), "rand"]
                 completed_process = subprocess.run(args, stdout=subprocess.PIPE, text=True)
                 output.append(float(completed_process.stdout))
 
-            result[point_num.index(p)][threads_num.index(t)] = np.mean(output)
+            result[cluster_num.index(c)][threads_num.index(t)] = np.mean(output)
             output.clear()
+            
 
-    for i in range(len(point_num)):
+    for i in range(len(cluster_num)):
         for j in range(len(threads_num)):
             speedup[i][j] = result[i][0] / result[i][j]
 
@@ -37,14 +39,16 @@ def speedUp():
     plt.xlabel("Thread Number")
     plt.ylabel("Speedup")
     plt.grid()
-    plt.plot(threads_num, speedup[0], label="1000 points")
-    plt.plot(threads_num, speedup[1], label="5000 points")
-    plt.plot(threads_num, speedup[2], label="10000 points")
-    plt.plot(threads_num, speedup[3], label="50000 points")
-    plt.plot(threads_num, speedup[4], label="100000 points")
+    plt.plot(threads_num, speedup[0], label="2 clusters")
+    plt.plot(threads_num, speedup[1], label="3 clusters")
+    plt.plot(threads_num, speedup[2], label="5 clusters")
+    plt.plot(threads_num, speedup[3], label="10 clusters")
+    plt.plot(threads_num, speedup[4], label="25 clusters")
+    plt.plot(threads_num, speedup[5], label="50 clusters")
     plt.legend()
     plt.show()
-    
+
+
 def dimension():
     threads_num = [1, 2, 4, 8, 16]
     output = []
@@ -54,7 +58,7 @@ def dimension():
     executable_path = "./kmean"
     for t in threads_num:
         print("Thread number: {}".format(t))
-        for i in range(100):
+        for i in range():
             args = [executable_path, "10000_2_10.csv", "10", str(t), "rand"]
             completed_process = subprocess.run(args, stdout=subprocess.PIPE, text=True)
             output.append(float(completed_process.stdout))
@@ -137,4 +141,4 @@ def plotSUdim():
     
     
 if __name__ == "__main__":
-    dimension()
+    speedUp()

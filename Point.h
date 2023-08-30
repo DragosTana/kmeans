@@ -12,6 +12,7 @@
 #include<vector>
 #include<iostream>
 #include<omp.h>
+#include<immintrin.h>
 
 #define DIM 3
 
@@ -56,13 +57,37 @@ struct Point{
         std::cout<<std::endl;
     }
 
-    double compute_distance(const Point& p) const {
-        double total_d = 0;
-        for (int i=0; i<DIM; i++)
-            total_d += (this->coordinates[i] - p.coordinates[i]) * (this->coordinates[i] - p.coordinates[i]);
-        return total_d;
-    }
-
 };
+
+/*
+* This function computes the euclidean distance between two points
+* @param p1: the first point
+* @param p2: the second point
+* @return the euclidean distance between the two points
+*/
+double euclidean_dist(const Point& p1, const Point& p2){
+    double distance= 0;
+    for (int i=0; i<DIM; i++)
+        distance += (p1.coordinates[i] - p2.coordinates[i]) * (p1.coordinates[i] - p2.coordinates[i]);
+    return distance;
+}
+
+/*
+* This function computes the euclidean distance between two points using avx2 instructions
+* @param p1: the first point
+* @param p2: the second point
+* @return the euclidean distance between the two points
+*/
+double simd_euclidean_dist(const Point& p1, const Point& p2){
+    double distance = 0;
+    __m256d p1_vec = _mm256_loadu_pd(p1.coordinates);
+    __m256d p2_vec = _mm256_loadu_pd(p2.coordinates);
+    __m256d diff = _mm256_sub_pd(p1_vec, p2_vec);
+    __m256d square = _mm256_mul_pd(diff, diff);
+    double* square_arr = (double*)&square;
+    distance = square_arr[0] + square_arr[1] + square_arr[2] + square_arr[3];
+    return distance;
+}
+
 
 #endif //KMEANS_POINT_H

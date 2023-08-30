@@ -6,6 +6,7 @@
 #include "Point.h"
 #include <random>
 
+
 /*
 * This function checks if a point is already in a vector of points
 * @param points: the vector of points
@@ -46,56 +47,59 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
 }
 
 /*
+* This function chooses the next centroid based on the weighted probability
+* @param points: the vector of points
+* @param distances: the vector of distances
+* @return the next centroid
+*/
+Point next_centroid (const std::vector<Point> &points, const std::vector<double> &distances) {
+    std::random_device rand_dev;
+    std::mt19937 gen(111);
+    std::discrete_distribution<> distrib(distances.begin(), distances.end());
+    int index = distrib(gen);
+    return points[index];
+}
+
+/*
 * This function initializes centroids by choosing the farthest points from each other
 * @param points: the vector of points
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> kmeanpp_initializer (const std::vector<Point>& points, int& k, int& threads) {
-    std::random_device random_device;;       
-    std::mt19937 gen(random_device());   
-    std::uniform_int_distribution<> distrib(0, points.size());
-
+std::vector<Point> kmeanpp_initializer (const std::vector<Point> &points, const int &k, const int &threads) {
     std::vector<Point> centroids;
-    Point starting_point = points[distrib(gen)];
-    starting_point.cluster = 0;
-    centroids.push_back(starting_point);
+    centroids.reserve(k);
+    int block = ceil(points.size() / threads);
 
-    for (int i=1; i<k; i++) {
-        double max_dist = 0.;
-        Point next_point;
-        // find the farthest point from its closest centroid
-        double partial_max_dist[omp_get_max_threads()];
-        for (double& el:partial_max_dist)
-            el = 0.;
-        Point partial_next_point[omp_get_max_threads()];
-        #pragma omp parallel for num_threads(threads) default(none) shared(partial_max_dist, partial_next_point) firstprivate(centroids, points) schedule(static, 64)
-        for (const Point& el:points) {
-            double min_dist = DBL_MAX;
-            for (const Point& c:centroids) {
-                double d = el.compute_distance(c);
-                if (d < min_dist)
-                    min_dist = d;
-            }
-            if (min_dist > partial_max_dist[omp_get_thread_num()]){
-                partial_max_dist[omp_get_thread_num()] = min_dist;
-                partial_next_point[omp_get_thread_num()] = el;
+    std::random_device rand_dev;
+    std::mt19937 gen(111);
+    std::uniform_int_distribution<> distrib(0, points.size() - 1);
+
+    // the first centroid is chosen randomly
+    centroids.push_back(points[distrib(gen)]);
+
+    // the other centroids are chosen based on the weighted probability
+    while (centroids.size() < k) {
+        std::vector<std::vector<double>> privateDistances(threads, std::vector<double>(points.size(), std::numeric_limits<double>::max()));
+
+        #pragma omp parallel for num_threads(threads) schedule(static, block) 
+        for (size_t i = 0; i < points.size(); i++) {
+            for (const Point &centroid : centroids) {
+                double distance = euclidean_dist(points[i], centroid);
+                privateDistances[omp_get_thread_num()][i] = std::min(privateDistances[omp_get_thread_num()][i], distance);
             }
         }
-        for (int j=0; j<omp_get_max_threads(); j++){
-            if (partial_max_dist[j] > max_dist){
-                max_dist = partial_max_dist[j];
-                next_point = partial_next_point[j];
+
+        // Merge private distances from all threads
+        std::vector<double> distances(points.size(), std::numeric_limits<double>::max());
+        for (int t = 0; t < threads; t++) {
+            for (size_t i = 0; i < points.size(); i++) {
+                distances[i] = std::min(distances[i], privateDistances[t][i]);
             }
         }
-        next_point.cluster = i;
-        centroids.push_back(next_point);
+        Point nextCentroid = next_centroid(points, distances);
+        centroids.push_back(nextCentroid);
     }
     return centroids;
 }
-
-
-
-
-
 
