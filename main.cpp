@@ -34,6 +34,7 @@ int release(int argc, const char *argv[]) {
     }
     else{
         std::cout<<"Invalid algorithm"<<std::endl;
+        return 1;
     }
     output_results(points);
     return 0;

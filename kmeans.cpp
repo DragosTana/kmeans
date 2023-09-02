@@ -14,7 +14,7 @@
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& centroids, int& epochs, int& k, int& threads) {
+std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& centroids, int epochs, int k, int threads) {
     
     std::vector<Point> new_centroids = std::vector<Point>(k);
     int cluster_cardinality[k];
@@ -55,7 +55,7 @@ std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& ce
 * @param k: the number of clusters
 * @return a vector of centroids
 */
-std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& centroids, int& epochs, int& k, int& threads, float eps = FLT_MIN) {
+std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& centroids, int epochs, int k, int threads, float eps = 10e-6) {
     
     std::vector<Point> new_centroids = std::vector<Point>(k, Point());
     std::vector<int> cluster_cardinality(k, 0);
