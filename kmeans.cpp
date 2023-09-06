@@ -16,16 +16,10 @@
 */
 std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& centroids, int epochs, int k, int threads) {
     
-    std::vector<Point> new_centroids = std::vector<Point>(k);
-    int cluster_cardinality[k];
+    std::vector<Point> new_centroids = std::vector<Point>(k, Point());
+    std::vector<int> cluster_cardinality(k, 0);
 
     for (int i = 0; i < epochs; i++) {
-
-        for (int j = 0; j < k; j++) {
-            new_centroids[j].to_zero(-1);
-            cluster_cardinality[j] = 0;
-        }
-
         for (Point& p: points) {
             double distance = DBL_MAX;
             for (int i = 0; i < k; i++) {
@@ -42,6 +36,8 @@ std::vector<Point> kmean_seq (std::vector<Point>& points, std::vector<Point>& ce
             new_centroids[i] /= cluster_cardinality[i];
         }
         centroids = new_centroids;
+        new_centroids = std::vector<Point>(k, Point());
+        cluster_cardinality = std::vector<int>(k, 0);
 
     }
     return centroids;
@@ -76,7 +72,7 @@ std::vector<Point> kmean_par (std::vector<Point>& points, std::vector<Point>& ce
 
     for (int i = 0; i < epochs; i++) {
 
-    #pragma omp parallel num_threads(threads) 
+    #pragma omp parallel num_threads(threads)
     {   
         std::vector<int> tmp_cluster_cardinality(k, 0);
         std::vector<Point> tmp_new_centroids(k, Point());   

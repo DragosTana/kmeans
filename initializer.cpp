@@ -54,7 +54,7 @@ std::vector<Point> random_initializer (const std::vector<Point>& points, const i
 */
 Point next_centroid (const std::vector<Point> &points, const std::vector<double> &distances) {
     std::random_device rand_dev;
-    std::mt19937 gen(rand_dev);
+    std::mt19937 gen(rand_dev());
     std::discrete_distribution<> distrib(distances.begin(), distances.end());
     int index = distrib(gen);
     return points[index];
@@ -72,7 +72,7 @@ std::vector<Point> kmeanpp_initializer (const std::vector<Point> &points, const 
     int block = ceil(points.size() / threads);
 
     std::random_device rand_dev;
-    std::mt19937 gen(rand_dev);
+    std::mt19937 gen(rand_dev());
     std::uniform_int_distribution<> distrib(0, points.size() - 1);
 
     // the first centroid is chosen randomly
