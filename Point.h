@@ -67,6 +67,7 @@ struct Point{
 */
 double euclidean_dist(const Point& p1, const Point& p2){
     double distance= 0;
+    #pragma omp simd 
     for (int i=0; i<DIM; i++)
         distance += (p1.coordinates[i] - p2.coordinates[i]) * (p1.coordinates[i] - p2.coordinates[i]);
     return distance;
